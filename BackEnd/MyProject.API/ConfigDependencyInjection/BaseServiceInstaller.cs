@@ -1,6 +1,4 @@
-﻿
-
-using MyProject.BL.BL;
+﻿using MyProject.BL.BL;
 using MyProject.BL.Interface;
 
 namespace MyProject.ConfigDependencyInjection

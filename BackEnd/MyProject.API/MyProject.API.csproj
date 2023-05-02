@@ -14,4 +14,8 @@
     <Folder Include="Controllers\Base\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyProject.BL\MyProject.BL.csproj" />
+  </ItemGroup>
+
 </Project>
