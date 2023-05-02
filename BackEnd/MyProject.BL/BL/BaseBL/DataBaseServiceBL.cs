@@ -1,4 +1,5 @@
-﻿using MyProject.BL.Interface;
+﻿using Dapper;
+using MyProject.BL.Interface;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace MyProject.BL.BL
 {
-    public class DataBaseServiceBL: IDataBaseService
+    public class DataBaseServiceBL : IDataBaseService
     {
 
         private const string MASTERDB_CONNETION_STRING = "Master_DB"; // Key get connectionString từ appsetting
-        private const string SQL_Get_Paging = "Proc_{0}_GetPaging"; 
+        private const string SQL_Get_Paging = "Proc_{0}_GetPaging";
         private const string SQL_Get_Total_Paging = "Proc_{0}_GetTotalPaging";
         private const string Proc_Insert = "Proc_{0}_Insert";
         private const string Proc_Update = "Proc_{0}_Update";
@@ -105,7 +106,7 @@ namespace MyProject.BL.BL
         /// <param name="passWord"></param>
         /// <param name="port"></param>
         /// <returns></returns>
-        public async Task<IDbConnection> GetConnectionToServerAsync(string server,string dataBase, string userID, string passWord, int port = 3306)
+        public async Task<IDbConnection> GetConnectionToServerAsync(string server, string dataBase, string userID, string passWord, int port = 3306)
         {
             var conBuilder = new MySqlConnectionStringBuilder()
             {
@@ -141,6 +142,146 @@ namespace MyProject.BL.BL
         {
             var con = GetConnectionToServerAsync(server, dataBase, userID, passWord, port).Result;
             return con;
+        }
+        #endregion
+
+        #region ========== QUERY METHODS ===========
+        #region ===== QueryUsingCommandText =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<T>> QueryUsingCommandTextAsync<T>(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync<T>(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<T>> QueryUsingCommandTextAsync<T>(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync<T>(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<T>> DoQueryUsingCommandTextAsync<T>(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var command = new CommandDefinition();
+            try
+            {
+                var result = new List<T>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    var cd = await BuildCommandDefinition(commandText,dicParams, commandDefinitionInfo, CommandType.Text);
+                    var query = await con.QueryAsync<T>(cd);
+                    result = query.ToList();
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        var cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        var query = await conn.QueryAsync<T>(cd);
+                        result = query.ToList();
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingStoredProcedure =====
+        #endregion
+        #endregion
+
+        #region ========== COMMON METHODS ==========
+        /// <summary>
+        /// model của CommandDefinitionInfo
+        /// </summary>
+        private class CommandDefinitionInfo
+        {
+            /// <summary>
+            /// Transaction
+            /// </summary>
+            public IDbTransaction Transaction { get; set; }
+            /// <summary>
+            /// Connection
+            /// </summary>
+            public IDbConnection Connection { get; set; }
+            /// <summary>
+            /// khởi tạo
+            /// </summary>
+            /// <param name="dbConnection"></param>
+            /// <param name="dbTransaction"></param>
+            public CommandDefinitionInfo(IDbConnection dbConnection = null, IDbTransaction dbTransaction = null)
+            {
+                this.Transaction = dbTransaction;
+                this.Connection = dbConnection;
+            }
+        }
+        /// <summary>
+        /// Hàm thực hiện build CommandText để thực hiện chạy
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="commandDefinitionInfo"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private async Task<CommandDefinition> BuildCommandDefinition(string sql, Dictionary<string, object> dicParams, CommandDefinitionInfo commandDefinitionInfo, CommandType commandType)
+        {
+            if (dicParams.Count == 0)
+            {
+                throw new Exception($"Yêu cần truyền param cho sql: {sql}");
+            }
+            switch (commandType)
+            {
+                case CommandType.Text:
+                    {
+                        var commandDefinition = new CommandDefinition(sql, dicParams, commandDefinitionInfo?.Transaction, commandType: CommandType.Text);
+                        return commandDefinition;
+                    }
+                case CommandType.StoredProcedure:
+                    {
+                        var commandDefinition = new CommandDefinition(sql, dicParams, commandDefinitionInfo?.Transaction, commandType: CommandType.StoredProcedure);
+                        return commandDefinition;
+                    }
+                default:
+                    {
+                        throw new Exception($"Truyền Đúng CommantType cho sql: {sql}");
+                    }
+            }
+            
         }
         #endregion
     }
