@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MyProject.BL.Interface;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -182,10 +183,10 @@ namespace MyProject.BL.BL
         /// <returns></returns>
         public async Task<List<T>> DoQueryUsingCommandTextAsync<T>(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
         {
-            var command = new CommandDefinition();
+            var cd = new CommandDefinition();
             try
             {
-                var result = new List<T>();
+                List<T> result = new List<T>();
                 var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
                 if (con != null)
                 {
@@ -194,7 +195,7 @@ namespace MyProject.BL.BL
                         Transaction = dbTransaction,
                         Connection = dbConnection
                     };
-                    var cd = await BuildCommandDefinition(commandText,dicParams, commandDefinitionInfo, CommandType.Text);
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
                     var query = await con.QueryAsync<T>(cd);
                     result = query.ToList();
                 }
@@ -207,7 +208,7 @@ namespace MyProject.BL.BL
                             Transaction = dbTransaction,
                             Connection = dbConnection
                         };
-                        var cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
                         var query = await conn.QueryAsync<T>(cd);
                         result = query.ToList();
                     }
@@ -222,6 +223,697 @@ namespace MyProject.BL.BL
         #endregion
 
         #region ===== QueryUsingStoredProcedure =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<T>> QueryUsingStoredProceduceAsync<T>(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync<T>(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<T>> QueryUsingStoredProceduceAsync<T>(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync<T>(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<T>> DoQueryUsingStoredProceduceAsync<T>(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                List<T> result = new List<T>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    var query = await con.QueryAsync<T>(cd);
+                    result = query.ToList();
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        var query = await conn.QueryAsync<T>(cd);
+                        result = query.ToList();
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingCommandText Dynamic =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingCommandTextAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> DoQueryUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                IEnumerable<dynamic> result = null;
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                    result = await con.QueryAsync(cd);
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        result = await conn.QueryAsync(cd);
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region ===== QueryUsingStoredProcedure Dynamic =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingStoredProceduceAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> DoQueryUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                IEnumerable<dynamic> result = null;
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    result = await con.QueryAsync(cd);
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        result = await conn.QueryAsync(cd);
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingCommandText Multiple =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbTransaction: dbTransaction, types: types);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> DoQueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, List<Type> types, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                List<List<object>> result = new List<List<object>>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                    using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                    {
+                        var index = 0;
+                        do
+                        {
+                            var queryResult = await queryMultiple.ReadAsync(types[index]);
+                            result.Add(queryResult.ToList());
+                            index++;
+                        } while (!queryMultiple.IsConsumed);
+                    }
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                        {
+                            var index = 0;
+                            do
+                            {
+                                var queryResult = await queryMultiple.ReadAsync(types[index]);
+                                result.Add(queryResult.ToList());
+                                index++;
+                            } while (!queryMultiple.IsConsumed);
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingStoredProcedure Multiple =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbTransaction: dbTransaction, types: types);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> DoQueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, List<Type> types, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                List<List<object>> result = new List<List<object>>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                    {
+                        var index = 0;
+                        do
+                        {
+                            var queryResult = await queryMultiple.ReadAsync(types[index]);
+                            result.Add(queryResult.ToList());
+                            index++;
+                        } while (!queryMultiple.IsConsumed);
+                    }
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                        {
+                            var index = 0;
+                            do
+                            {
+                                var queryResult = await queryMultiple.ReadAsync(types[index]);
+                                result.Add(queryResult.ToList());
+                                index++;
+                            } while (!queryMultiple.IsConsumed);
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingCommandText Multiple Dynamic =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> DoQueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                List<List<object>> result = new List<List<object>>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                    using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                    {
+                        var index = 0;
+                        do
+                        {
+                            var queryResult = await queryMultiple.ReadAsync<dynamic>();
+                            result.Add(queryResult.ToList());
+                            index++;
+                        } while (!queryMultiple.IsConsumed);
+                    }
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                        {
+                            var index = 0;
+                            do
+                            {
+                                var queryResult = await queryMultiple.ReadAsync<dynamic>();
+                                result.Add(queryResult.ToList());
+                                index++;
+                            } while (!queryMultiple.IsConsumed);
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingStoredProcedure Multiple Dynamic =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbTransaction: dbTransaction);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> DoQueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                List<List<object>> result = new List<List<object>>();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                    {
+                        var index = 0;
+                        do
+                        {
+                            var queryResult = await queryMultiple.ReadAsync<dynamic>();
+                            result.Add(queryResult.ToList());
+                            index++;
+                        } while (!queryMultiple.IsConsumed);
+                    }
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        using (var queryMultiple = await con.QueryMultipleAsync(cd))
+                        {
+                            var index = 0;
+                            do
+                            {
+                                var queryResult = await queryMultiple.ReadAsync<dynamic>();
+                                result.Add(queryResult.ToList());
+                                index++;
+                            } while (!queryMultiple.IsConsumed);
+                        }
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingCommandText Multiple ListStringType =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingCommandTextAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbTransaction: dbTransaction, types: types);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> DoQueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, List<string> types, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                Dictionary<string, List<object>> result = new Dictionary<string, List<object>>();
+                var queryResult = await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbTransaction, dbConnection);
+                for (int i = 0; i < types.Count; i++)
+                {
+                    result.Add(types[i], queryResult[i]);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        #endregion
+
+        #region ===== QueryUsingStoredProcedure Multiple ListStringType =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection, types:types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbTransaction: dbTransaction, types: types);
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy Query Using CommandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> DoQueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, List<string> types, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            var cd = new CommandDefinition();
+            try
+            {
+                Dictionary<string, List<object>> result = new Dictionary<string, List<object>>();
+                var queryResult = await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbTransaction, dbConnection);
+                for( var i = 0; i < types.Count; i++)
+                {
+                    result.Add(types[i], queryResult[i]);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
         #endregion
         #endregion
 
