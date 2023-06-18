@@ -1,11 +1,14 @@
 ﻿using Dapper;
 using MyProject.BL.Interface;
+using MyProject.Model.Attribute;
+using MyProject.Model.Model;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI.Common;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -156,6 +159,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<List<T>> QueryUsingCommandTextAsync<T>(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync<T>(commandText, dicParams);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<List<T>> QueryUsingCommandTextAsync<T>(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
         {
             return await DoQueryUsingCommandTextAsync<T>(commandText, dicParams, dbConnection: dbConnection);
@@ -223,6 +238,18 @@ namespace MyProject.BL.BL
         #endregion
 
         #region ===== QueryUsingStoredProcedure =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<T>> QueryUsingStoredProceduceAsync<T>(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync<T>(commandText, dicParams);
+        }
         /// <summary>
         /// Hàm xử lý query Using commandText
         /// </summary>
@@ -306,6 +333,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingCommandTextAsync(commandText, dicParams);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<dynamic>> QueryUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
         {
             return await DoQueryUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection);
@@ -380,6 +419,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<IEnumerable<dynamic>> QueryUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryUsingStoredProceduceAsync(commandText, dicParams);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<dynamic>> QueryUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
         {
             return await DoQueryUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection);
@@ -445,6 +496,18 @@ namespace MyProject.BL.BL
         #endregion
 
         #region ===== QueryUsingCommandText Multiple =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, types: types);
+        }
         /// <summary>
         /// Hàm xử lý query Using commandText
         /// </summary>
@@ -544,6 +607,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, List<Type> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<Type> types)
         {
             return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection, types: types);
@@ -627,6 +702,18 @@ namespace MyProject.BL.BL
         #endregion
 
         #region ===== QueryUsingCommandText Multiple Dynamic =====
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams);
+        }
         /// <summary>
         /// Hàm xử lý query Using commandText
         /// </summary>
@@ -726,6 +813,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<List<List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
         {
             return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection);
@@ -817,6 +916,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingCommandTextAsync(string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<Dictionary<string, List<object>>> QueryMultipleUsingCommandTextAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<string> types)
         {
             return await DoQueryMultipleUsingCommandTextAsync(commandText, dicParams, dbConnection: dbConnection, types: types);
@@ -871,6 +982,18 @@ namespace MyProject.BL.BL
         /// <param name="commandText"></param>
         /// <param name="dicParams"></param>
         /// <returns></returns>
+        public async Task<Dictionary<string, List<object>>> QueryMultipleUsingStoredProceduceAsync(string commandText, Dictionary<string, object> dicParams, List<string> types)
+        {
+            return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, types: types);
+        }
+        /// <summary>
+        /// Hàm xử lý query Using commandText
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
         public async Task<Dictionary<string, List<object>>> QueryMultipleUsingStoredProceduceAsync(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams, List<string> types)
         {
             return await DoQueryMultipleUsingStoredProceduceAsync(commandText, dicParams, dbConnection: dbConnection, types:types);
@@ -917,7 +1040,350 @@ namespace MyProject.BL.BL
         #endregion
         #endregion
 
-        #region ========== GET DATA METHODS =========
+        #region ========== EXECUTE METHODS =========
+        #region ===== ExecuteUsingCommandText =====
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingCommandText(string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExcuteUsingCommandText(commandText, dicParams);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingCommandText(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExcuteUsingCommandText(commandText, dicParams, dbConnection: dbConnection);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingCommandText(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExcuteUsingCommandText(commandText, dicParams, dbTransaction: dbTransaction);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy execute command text
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<bool> DoExcuteUsingCommandText(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            try
+            {
+                var isSuccess = false;
+                var cd = new CommandDefinition();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                    var query = await con.ExecuteAsync(cd);
+                    isSuccess = query > 0 ? true : false;
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        var query = await conn.ExecuteAsync(cd);
+                        isSuccess = query > 0 ? true : false;
+                    }
+                }
+                return isSuccess;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+        #endregion
+
+        #region ===== ExecuteUsingProcedure =====
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingProcedure(string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteUsingProcedure(commandText, dicParams);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingProcedure(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteUsingProcedure(commandText, dicParams, dbConnection: dbConnection);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<bool> ExecuteUsingProcedure(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteUsingProcedure(commandText, dicParams, dbTransaction: dbTransaction);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy execute command text
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<bool> DoExecuteUsingProcedure(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            try
+            {
+                var isSuccess = false;
+                var cd = new CommandDefinition();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    var query = await con.ExecuteAsync(cd);
+                    isSuccess = query > 0 ? true : false;
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                        var query = await conn.ExecuteAsync(cd);
+                        isSuccess = query > 0 ? true : false;
+                    }
+                }
+                return isSuccess;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+        #endregion
+
+        #region ===== ExecuteScalarUsingCommandText =====
+        /// <summary>
+        /// Hàm chạy command Text trả về 1 giá trị theo model
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingCommandText<T>(string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingCommandText<T>(commandText, dicParams);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingCommandText<T>(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingCommandText<T>(commandText, dicParams, dbConnection: dbConnection);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingCommandText<T>(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingCommandText<T>(commandText, dicParams, dbTransaction: dbTransaction);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy execute command text
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<T> DoExecuteScalarUsingCommandText<T>(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            try
+            {
+                var result = default(T);
+                var cd = new CommandDefinition();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                    result = await con.ExecuteScalarAsync<T>(cd);
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.Text);
+                        result = await conn.ExecuteScalarAsync<T>(cd);
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+        #endregion
+
+        #region ===== ExecuteScalarUsingProcedure =====
+        /// <summary>
+        /// Hàm chạy command Text trả về 1 giá trị theo model
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingProcedure<T>(string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingProcedure<T>(commandText, dicParams);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingProcedure<T>(IDbConnection dbConnection, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingProcedure<T>(commandText, dicParams, dbConnection: dbConnection);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm chạy command Text trả về thành công/thất bại
+        /// </summary>
+        /// <param name="dbConnection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <returns></returns>
+        public async Task<T> ExecuteScalarUsingProcedure<T>(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams)
+        {
+            var isSuccess = await DoExecuteScalarUsingProcedure<T>(commandText, dicParams, dbTransaction: dbTransaction);
+            return isSuccess;
+        }
+        /// <summary>
+        /// Hàm thực hiện chạy execute command text
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="dicParams"></param>
+        /// <param name="dbTransaction"></param>
+        /// <param name="dbConnection"></param>
+        /// <returns></returns>
+        public async Task<T> DoExecuteScalarUsingProcedure<T>(string commandText, Dictionary<string, object> dicParams, IDbTransaction dbTransaction = null, IDbConnection dbConnection = null)
+        {
+            try
+            {
+                var result = default(T);
+                var cd = new CommandDefinition();
+                var con = dbTransaction != null ? dbTransaction.Connection : dbConnection;
+                if (con != null)
+                {
+                    var commandDefinitionInfo = new CommandDefinitionInfo()
+                    {
+                        Transaction = dbTransaction,
+                        Connection = dbConnection
+                    };
+                    cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                    result = await con.ExecuteScalarAsync<T>(cd);
+                }
+                else
+                {
+                    using (var conn = await GetConnectionAsync())
+                    {
+                        var commandDefinitionInfo = new CommandDefinitionInfo()
+                        {
+                            Transaction = dbTransaction,
+                            Connection = dbConnection
+                        };
+                        cd = await BuildCommandDefinition(commandText, dicParams, commandDefinitionInfo, CommandType.StoredProcedure);
+                        result = await conn.ExecuteScalarAsync<T>(cd);
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+        #endregion
         #endregion
 
         #region ========== COMMON METHODS ==========
@@ -977,6 +1443,65 @@ namespace MyProject.BL.BL
                     }
             }
             
+        }
+        /// <summary>
+        /// Hàm lấy tên store Insert dữ liệu
+        /// </summary>
+        /// <param name="baseModel"></param>
+        /// <returns></returns>
+        public string GetInsertProcedureName(BaseModel baseModel)
+        {
+            var configTable = (ConfigTableAttribute)baseModel.GetType().GetCustomAttributes(typeof(ConfigTableAttribute), true)?.FirstOrDefault();
+            if (configTable != null)
+            {
+                if (!string.IsNullOrWhiteSpace(configTable.ProcInsert))
+                {
+                    return configTable.ProcInsert;
+                }
+                else if(!string.IsNullOrWhiteSpace(configTable.TableName))
+                {
+                    var tableName = configTable.TableName;
+                    var proName = string.Format(Proc_Insert, tableName);
+                    return proName;
+                }
+                else { 
+                    return string.Empty; 
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+        /// <summary>
+        /// Hàm lấy tên store Update dữ liệu
+        /// </summary>
+        /// <param name="baseModel"></param>
+        /// <returns></returns>
+        public string GetUpdateProcedureName(BaseModel baseModel)
+        {
+            var configTable = (ConfigTableAttribute)baseModel.GetType().GetCustomAttributes(typeof(ConfigTableAttribute), true)?.FirstOrDefault();
+            if (configTable != null)
+            {
+                if (!string.IsNullOrWhiteSpace(configTable.ProcUpdate))
+                {
+                    return configTable.ProcInsert;
+                }
+                else if (!string.IsNullOrWhiteSpace(configTable.TableName))
+                {
+                    var tableName = configTable.TableName;
+                    var proName = string.Format(Proc_Update, tableName);
+                    return proName;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
         #endregion
     }

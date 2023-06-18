@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyProject.Model.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,10 @@ namespace MyProject.Model.Model
 {
     public class BaseModel
     {
+        /// <summary>
+        /// Trạng thái của bản ghi
+        /// </summary>
+        public EnumState State { get; set; } = EnumState.None;
         /// <summary>
         /// Ngày tạo
         /// </summary>

@@ -1,5 +1,6 @@
 ﻿using MyProject.BL.BL;
 using MyProject.BL.Interface;
+using MyProject.BL.Interface.BaseInterface;
 
 namespace MyProject.ConfigDependencyInjection
 {
@@ -14,6 +15,7 @@ namespace MyProject.ConfigDependencyInjection
         public static IServiceCollection BaseServiceInstallerApp(this IServiceCollection services, IConfiguration configuration)
         {
             DBServiceInstaller(services);
+            BaseServiceCollectionInstaller(services);
             return services;
         }
 
@@ -25,6 +27,13 @@ namespace MyProject.ConfigDependencyInjection
         public static void DBServiceInstaller(this IServiceCollection services)
         {
             services.AddTransient<IDataBaseService, DataBaseServiceBL>();
+        }
+
+        public static void BaseServiceCollectionInstaller(this IServiceCollection services)
+        {
+            services.AddTransient<BaseServiceCollection, BaseServiceCollection>();
+            services.AddTransient<IConfigService, ConfigServiceBL>();
+            services.AddTransient<IBaseBL, BaseBL>();
         }
     }
 }

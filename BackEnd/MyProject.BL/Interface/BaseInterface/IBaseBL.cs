@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MyProject.Model.Model;
+using MyProject.Model.Model.Base;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,10 +7,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyProject.BL.Interface
+namespace MyProject.BL.Interface.BaseInterface
 {
-    public interface IDataBaseService
+    public interface IBaseBL
     {
+        /// <summary>
+        /// Hàm xử lý lấy chuỗi connectionString từ file appsettings.json
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        string GetConnectString(string key);
+
+        /// <summary>
+        /// Hàm xử lý lấy chuỗi connectionString từ file appsettings.json
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        string GetAppSetting(string key, string valueDefault = null);
+
         #region ========== KHU VỰC KẾT NỐI DB ==========
         /// <summary>
         /// Hàm xử lý lấy kết nối DB theo connectionString
@@ -464,5 +479,12 @@ namespace MyProject.BL.Interface
         Task<T> ExecuteScalarUsingProcedure<T>(IDbTransaction dbTransaction, string commandText, Dictionary<string, object> dicParams);
         #endregion
         #endregion
+
+        /// <summary>
+        /// Hàm thêm dữ liệu
+        /// </summary>
+        /// <param name="baseModel"></param>
+        /// <returns></returns>
+        Task<ServiceReponse> SaveData(BaseModel baseModel);
     }
 }
