@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyProject.Model.Attribute;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MyProject.Model.Model
 {
+    [ConfigTable(tableName: "employee", isDeleted: true)]
     public class Employee : BaseModel
     {
         [Key]

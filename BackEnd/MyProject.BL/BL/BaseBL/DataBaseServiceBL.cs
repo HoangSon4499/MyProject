@@ -917,6 +917,9 @@ namespace MyProject.BL.BL
         #endregion
         #endregion
 
+        #region ========== GET DATA METHODS =========
+        #endregion
+
         #region ========== COMMON METHODS ==========
         /// <summary>
         /// model của CommandDefinitionInfo
